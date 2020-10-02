@@ -1,0 +1,129 @@
+{% extends 'assignment/base.html' %}
+{% load static %}
+{% load filters %}
+{% load crispy_forms_tags %}
+{% block head %}{% endblock %}
+
+
+{% block content %}
+    <style>
+        .std-results-wrapper{
+            position: relative;
+        }
+        .sticky {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background-color: rgba(0, 0, 0, 0.1);
+        }
+
+        .header{
+            background-color: rgba(0, 0, 0, 0.1);
+            z-index: 2;
+        }
+
+        .sticky + .contents {
+            padding-top: 200px;
+        }
+
+        
+    </style>
+
+    <div class="std-results-wrapper">
+        <div class="header" id="myHeader">
+            <div id="h__w1">
+                <div id="h__w">
+                    
+                    <div class="b">
+                        
+                        <a href="{% url 'assignment_app:all-students' o_c1.pk %}"><i class="fa fa-long-arrow-left" aria-hidden="true"></i></a>
+                        
+                    </div>
+                    <div class="h">
+                        <h4>STUDENTS' RESULTS</h4>
+                        <h4 style="font-size: 1em;">{{ c }}</h4>
+                    </div>
+                    
+                    <div class="l">
+                        <a href="{% url 'assignment_app:pdf-download' o_c1.courses %}"><i class="fa fa-download" aria-hidden="true"></i></a>
+                    </div>
+                </div>
+                <div class="sem"><h5>{{ o_c1.sem }}</h5></div>
+                <!-- search -->
+                <hr style="background-color: wheat;">
+                <div id="search__std">
+                    <form class="form-inline my-2 my-lg-0">
+                        <input id="q" name="q" value="{{ request.GET.q }}" class="form-control mr-sm-2 bgcol" type="search" placeholder="Index number" aria-label="Search">
+                        <button class="btn btn-outline-info my-2 my-sm-0" type="submit">Search</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="contents">
+        {% for u in st %}
+            
+                <div class="row mb-2">
+                    <div class="col-md-12">
+                        <div class="card">
+                            <div class="card-body">
+                                <div>
+                                    <strong>Index Number:</strong> <span style="color: green;">{{ u.user.index_number }}</span>
+                                </div>
+                                
+                                <table class="table table-bordered">
+                                    <thead>
+                                    <tr>
+                                        <th scope="col">Activity</th>
+                                        <th scope="col">Mark</th>
+                                        <th scope="col">Total</th>
+                                        <th scope="col"><i class="fa fa-calendar" aria-hidden="true"></i> Date Graded</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    {% for r in u.studentresult_set.all %}
+                                    <tr>
+                                        <td style="width: 10%;">
+                                            <div>
+                                            {{ r.title }}
+                                            </div>
+                                            (<span style="color: blue; font-size: 0.8em;">{{ r.assignment.header }}</span>)
+                                        </td>
+                                        <td>{{ r.scored }}</td>
+                                        <td>{{ r.total }}</td>
+                                        <td>{{ r.date_graded1 }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                    </tbody>
+                                </table>
+                                
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            
+        {% endfor %}
+        </div>
+    </div>
+
+    <script>
+        window.onscroll = function() {myFunction()};
+        
+        var header = document.getElementById("myHeader");
+        var sticky = header.offsetTop;
+        
+        function myFunction() {
+          if (window.pageYOffset > sticky) {
+            header.classList.add("sticky");
+            header.style.backgroundColor = '#000000'
+            header.style.opacity = '0.8'
+          } else {
+            header.classList.remove("sticky");
+            header.style.backgroundColor = '#000000'
+            header.style.opacity = '0.8' 
+          }
+
+        }
+    </script>
+{% endblock %}

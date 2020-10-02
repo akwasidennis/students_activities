@@ -1,0 +1,102 @@
+{% extends 'assignment/base.html' %}
+{% load static %}
+{% load filters %}
+{% load crispy_forms_tags %}
+{% block head %}{% endblock %}
+
+
+{% block content %}
+    <div class="question-wrapper">
+    
+        {% for q in question %}
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="card">
+                        <div class="card-body p-2">
+                            <div>{{ q.question_text }}</div>
+
+                            <form action="." method="POST" class="mt-2 ml-2">
+                                {% csrf_token %}
+                                {% for choice in q.choice_set.all %}
+                                    <input  id="form" style="cursor: pointer;" type="radio" name="c" id="choice{{ forloop.counter }}" onclick=location.href="{% url 'save-choice' q.pk choice.choice %}"; value="{{ choice.pk }}" {{ choice.is_checked }}/>
+                                    <label for="choice{{ forloop.counter }}">{{ choice.choice }}</label><br />
+                                {% endfor %}
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+        <!-- <div>
+            <input class="btn btn-success" type="button" id="btnSubmit" value="submit" onclick="getAnswers()">
+        </div> -->
+
+
+        <!-- -----choice chosen------ -->
+        <hr style="background-color: blanchedalmond; height: 2px; margin-top: 5rem;">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="card">
+                        <div class="card-body p-2">
+                            {% for sc in selected_choice %}
+                                {% if sc.is_checked == 'checked' %}
+                                    <div class="selected-choice">
+                                        <div>{{ sc.choice }}</div>
+                                        <div>
+                                            {% if sc.choice == sc.question.correct_ans %}
+                                                <div style="color: green; font-size: 1.5em;"><i class="fa fa-check" aria-hidden="true"></i></div>
+                                            {% else %}
+                                                <div style="color: red; font-size: 1.5em;"><i class="fa fa-times" aria-hidden="true"></i></div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                {% endif %}
+                            {% endfor %}
+                            <hr>
+                            <div id="userAns"></div>
+                            <hr style="background-color: black;">
+                            <div>Marks scored: {{ marks_scored }} / {{ question.count|floatformat:"1" }}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+       
+    </div>
+
+
+    <!-- 
+        <div class="ml-2">
+        <input style="cursor: pointer;" type="radio" name="csrfmiddlewaretoken" id="q{{ forloop.counter }}" value="{{ q.option2 }}"/>
+        <label for="q{{ forloop.counter }}">{{ q.option2 }}</label>
+        </div>
+        <div class="ml-2">
+        <input style="cursor: pointer;" type="radio" name="csrfmiddlewaretoken" id="q{{ forloop.counter }}" value="{{ q.option3 }}"/>
+        <label for="q{{ forloop.counter }}">{{ q.option3 }}</label>
+        </div>
+        <div class="ml-2">
+        <input style="cursor: pointer;" type="radio" name="csrfmiddlewaretoken" id="q{{ forloop.counter }}" value="{{ q.option4 }}"/>
+        <label for="q{{ forloop.counter }}">{{ q.option4 }}</label>
+        </div>
+     -->
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+    <script>
+        const form = document.getElementById("form");
+        form.addEventListener("submit", getAnswers)
+        function getAnswers(e){
+            e.preventDefault();
+            $.ajax({
+                type: 'POST',
+                url: "{% url 'set-questions' %}",
+                data: $("#form").serialize(),
+                dataType: 'json',
+                success: function (data){
+                    if (data.msg === "Success"){
+                        form.reset();
+                        console.log("submitted successfully")
+                    }
+                }
+            })
+        }
+    </script>
+{% endblock %}

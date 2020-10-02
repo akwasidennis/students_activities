@@ -1,0 +1,77 @@
+{% extends 'assignment/base.html' %}
+{% load static %}
+{% load filters %}
+{% load crispy_forms_tags %}
+{% block head %}{% endblock %}
+
+
+{% block content %}
+<div class="grade-std-wrapper">
+    <div style="font-size: 1.8em;">
+        <a style="color: white;" href="{% url 'assignment_app:all-students' sel.pk %}"><i class="fa fa-long-arrow-left" aria-hidden="true"></i></a>
+    </div>
+    
+    <div style="text-align: center; font-size: 1.8em; font-weight: 500; color: white; margin-bottom: 10px;">{{ sel.courses }}</div>
+    <div>
+        <div style="text-align: center; font-size: 1.8em; font-weight: 500; color: white; margin-bottom: 10px;">({{ request.resolver_match.kwargs.index }})</div>
+    </div>
+    <!-- {% regroup ass by activity as ass_list %} -->
+    {% for ac in c_act %}
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="grouper mb-2">{{ ac.activity }}</div>
+                    <div class="topics mb-2 bg-success pl-2 pr-2">
+                        <div>File</div>
+                        <div class="pl-4">Status</div>
+                        <div class="mr-2">Date submitted</div>
+                        <div class="pr-4">Action</div>
+                    </div>
+                    {% for a in ac.assignment_set.all %}
+                        <div class="row mb-2">
+                            <div class="col-md-12">
+                                <div class="card bg-dark" id="cd__b">
+                                    <div class="card-body">
+
+                                        <div class="list-ass">
+
+                                            <div>
+                                            <div id="b__nm">{{ a.file_name }}
+                                            </div>
+                                            <div id="view__sol">
+                                                <a class="ripple" style="color: red;" href="{% url 'assignment_app:view-assignment-pdf' a.pk %}" target="_blank"><i class="fa fa-file-pdf-o" aria-hidden="true"></i></a>
+                                            </div>
+                                            </div>
+                                            <div>{{ a.status }}</div>
+                                            <div>{{ a.date_submitted }}</div>
+                                            <div>
+                                                {% if a.status == 'graded' %}
+                                                    {% for s in a.studentresult_set.all %}
+                                                        <a class="btn btn-success" href="{% url 'assignment_app:update-grade' s.pk a.status s.studentothercourse.selectcourse.pk s.user.index_number %}" role="button">Update</a>
+                                                    {% endfor %}
+                                                {% else %}
+                                                    <a class="btn btn-primary" href="{% url 'assignment_app:score-student-section' a.studentothercourse.pk a.pk %}" role="button">Evaluate</a>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+
+</div>
+<script src="{% static 'assignment/js/hover.js' %}"></script>
+<!-- <div class="swollen">
+                    <div><i class="fa fa-calendar" aria-hidden="true"></i> Date Uploaded: {{ u.date_created }}</div>
+                    <div><i class="fa fa-calendar" aria-hidden="true"></i> Submission Date: {{ u.submission_date }}</div>
+                    </div>
+                    <hr> -->
+{% endblock %}
